@@ -1,10 +1,7 @@
 FROM golang:alpine as builder
-RUN apk add --no-cache curl jq
 RUN mkdir -p /assets
-RUN url=$(curl -s "https://api.github.com/repos/concourse/concourse/releases/latest" \
-    | jq -r '.assets[] | select(.name | test("fly-5.2.8-linux-amd64.tgz$")) | .browser_download_url') &&\
-    curl -L "$url" -o /assets/fly
-COPY . /go/src/github.com/concourse/concourse-pipeline-resource
+ADD fly/fly-*-linux-amd64.tgz /assets/
+COPY concourse-pipeline-resource /go/src/github.com/concourse/concourse-pipeline-resource
 ENV CGO_ENABLED 0
 RUN go build -o /assets/in github.com/concourse/concourse-pipeline-resource/cmd/in
 RUN go build -o /assets/out github.com/concourse/concourse-pipeline-resource/cmd/out
